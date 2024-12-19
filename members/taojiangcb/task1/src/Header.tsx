@@ -4,11 +4,7 @@ interface Props {
 }
 
 const Header = ({ title }: Props) => {
-  return (
-    <header>
-      <h3>{title}</h3>
-    </header>
-  )
+  return <h4>{title}</h4>
 }
 
 export default Header;

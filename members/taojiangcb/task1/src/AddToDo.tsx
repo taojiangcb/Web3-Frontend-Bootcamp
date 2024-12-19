@@ -1,25 +1,51 @@
-import Paper from '@mui/material/Paper';
+import React, { useCallback, useState } from 'react';
+import { withStore, WithStoreChildProps } from './store';
+import { IconButton, Input } from '@mui/material';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 
-import { IconButton, InputBase } from '@mui/material';
-import { Search as SearchIcon } from '@mui/icons-material'
-interface Props {
+interface Props extends WithStoreChildProps {
+  defaultValue?: string;
 }
+const AddToDo: React.FC<Props> = (props: Props) => {
+  const { store, ...reset } = props;
+  const [relValue, setRelValue] = useState('');
+  
+  const onTextChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setRelValue(e.target.value);
+  }, []);
 
-const AddToDo: React.FC<Props> = (props) => {
-  return <div>
-    <Paper>
+  const onAddTodo = useCallback(() => {
+    if (!relValue) return alert('请输入待办事项');
+    const newData = {
+      id: Date.now().toString(),
+      text: relValue,
+      done: false
+    }
+    setRelValue('');
+    store.setData([newData, ...store.data]);
+  }, [relValue]);
 
+  const handleKeyPress = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter') {
+      // 处理 Enter 键提交表单
+      onAddTodo();
+    }
+  };
 
-      {/* <InputBase
+  return <React.Fragment>
+    <Input
       sx={{ ml: 1, flex: 1 }}
-      placeholder="Search Google Maps"
+      placeholder="请输入待办事项"
       inputProps={{ 'aria-label': 'search google maps' }}
-    /> */}
-      <IconButton type="button" sx={{ p: '10px' }} aria-label="search">
-        <SearchIcon />
-      </IconButton>
-    </Paper>
-  </div>
+      onChange={onTextChange}
+      value={relValue}
+      onKeyDown={handleKeyPress} // 监听键盘按下事件
+      {...reset}
+    />
+    <IconButton onClick={onAddTodo} type="button" sx={{ p: '10px' }} aria-label="search">
+      <AddCircleIcon />
+    </IconButton>
+  </React.Fragment>
 }
 
-export default AddToDo;
+export default withStore(AddToDo);
